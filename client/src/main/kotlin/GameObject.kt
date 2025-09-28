@@ -11,21 +11,7 @@ open class GameObject(vararg meshes: Mesh) : UniformProvider("gameObject") {
         addComponentsAndGatherUniforms(*meshes)
     }
 
-    open class Motion(val gameObject: GameObject) {
-        open operator fun invoke(
-            dt: Float,
-            t: Float,
-            keysPressed: Set<String>,
-            interactors: ArrayList<GameObject>,
-            spawn: ArrayList<GameObject>
-        ): Boolean {
-            return true
-        }
-    }
 
-    fun collide(gameObject: GameObject) {
-
-    }
     fun update() {
         modelMatrix.set()
             .scale(scale)

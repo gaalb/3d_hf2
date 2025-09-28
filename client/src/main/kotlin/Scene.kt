@@ -10,8 +10,21 @@ class Scene(
 ) : UniformProvider("scene") {
     val vsGameObject = Shader(gl, GL.VERTEX_SHADER, "camera-model-vs.glsl")
     val fsGameObject = Shader(gl, GL.FRAGMENT_SHADER, "material-fs.glsl")
+    val fsAnimation = Shader(gl, GL.FRAGMENT_SHADER, "animation-fs.glsl")
+    val animationProgram = Program(gl, vsGameObject, fsAnimation)
     val gameObjectProgram = Program(gl, vsGameObject, fsGameObject)
     val quadGeometry = TexturedQuadGeometry(gl)
+
+    val explosionTexture = Texture2D(gl, "media/boom.png")
+    val fx = ArrayList<Explosion>()
+    fun spawnExplosion(at: Vec2) {
+        fx += Explosion(animationProgram, quadGeometry, explosionTexture).apply {
+            position.set(at)
+                scale.set(0.1f, 0.1f, 0.1f)
+            update()
+        }
+    }
+
     val backgroundTexture = Texture2D(gl, "media/background_light.jpg")
     val backgroundMaterial = Material(gameObjectProgram).apply {
         this["colorTexture"]?.set(backgroundTexture)
@@ -25,10 +38,10 @@ class Scene(
         this["colorTexture"]?.set(Texture2D(gl, "media/raider.png"))
         this["tint"]?.set(1f, 1f, 1f, 1f)
     }
-    val bulletTexture = Texture2D(gl, "media/explosion.png")
+    val bulletTexture = Texture2D(gl, "media/bomb.png")
     val bulletMaterial = Material(gameObjectProgram).apply {
         this["colorTexture"]?.set(bulletTexture)
-        this["tint"]?.set(1f, 1f, 1f)
+        this["tint"]?.set(1f, 0f, 0f)
     }
 
     val chaserMaterial = Material(gameObjectProgram).apply {
@@ -62,7 +75,7 @@ class Scene(
         0.25f,
         Vec2(1.0f, 100.0f),
         Mesh(raiderMaterial, quadGeometry)).apply {
-        scale.set(0.1f, 0.1f, 0.1f)
+        scale.set(0.15f, 0.15f, 0.15f)
         yaw = PI.toFloat()/2.0f
         shoot = { ->
             spawnBullet(this)
@@ -194,6 +207,7 @@ class Scene(
                     if (shouldDestroy(a, b)) {
                         a.isAlive = false
                         b.isAlive = false
+                        spawnExplosion((a.position + b.position) * 0.5f)
                     }
                 }
             }
@@ -263,5 +277,9 @@ class Scene(
         }
 
         objects.forEach { it.draw(camera) }
+
+        gl.useProgram(animationProgram.glProgram)
+        fx.removeAll { !it.advance(dt) }
+        fx.forEach { it.draw(camera) }
     }
 }

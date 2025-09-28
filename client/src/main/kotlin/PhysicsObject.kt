@@ -32,7 +32,7 @@ open class PhysicsObject(val mass: Float, val momentOfInertia: Float, val dragCo
         angVel += angAcc * dt
     }
 
-    fun update(dt: Float,
+    open fun update(dt: Float,
                keysPressed: Set<String>,
                interactors: ArrayList<GameObject>,
                drag: Drag) {
