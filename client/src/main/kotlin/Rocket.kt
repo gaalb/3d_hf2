@@ -11,7 +11,7 @@ fun Vec2.signedAngleTo(other: Vec2): Float {
     return atan2(crossZ.toDouble(), dot.toDouble()).toFloat()
 }
 
-class Chaser(target: Avatar, mass: Float, momentOfInertia: Float, dragCoeffs: Vec2, vararg meshes: Mesh):
+class Rocket(target: Avatar, mass: Float, momentOfInertia: Float, dragCoeffs: Vec2, vararg meshes: Mesh):
     PhysicsObject(mass, momentOfInertia, dragCoeffs, *meshes){
     private val thrust = 2f
     private val Kp     = 10.0f

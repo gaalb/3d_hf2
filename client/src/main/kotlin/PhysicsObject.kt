@@ -21,7 +21,7 @@ open class PhysicsObject(val mass: Float, val momentOfInertia: Float, val dragCo
     var calcForce: (keysPressed: Set<String>) -> Vec2 = {Vec2()}
     var calcTorque: (keysPressed: Set<String>) -> Float = {0.0f}
     var handleCollision: (other: GameObject) -> Unit = {}
-    fun kinematics(dt: Float) {
+    open fun kinematics(dt: Float) {
         position += velocity * dt
         yaw += angVel * dt
     }

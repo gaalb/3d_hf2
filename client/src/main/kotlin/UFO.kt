@@ -1,4 +1,5 @@
 import vision.gears.webglmath.Vec2
+import kotlin.math.*
 
 class UFO(target: Avatar, mass: Float, momentOfInertia: Float, dragCoeffs: Vec2, vararg meshes: Mesh):
     PhysicsObject(mass, momentOfInertia, dragCoeffs, *meshes){
@@ -11,5 +12,11 @@ class UFO(target: Avatar, mass: Float, momentOfInertia: Float, dragCoeffs: Vec2,
         }
 
         calcTorque = { _ -> 0.0f}
+    }
+    override fun kinematics(dt: Float) {
+        if (velocity.lengthSquared() > 0.001) {
+            yaw = atan2(velocity.y, velocity.x)
+        }
+        super.kinematics(dt)
     }
 }

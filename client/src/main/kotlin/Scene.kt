@@ -44,7 +44,7 @@ class Scene(
         this["tint"]?.set(1f, 0f, 0f)
     }
 
-    val chaserMaterial = Material(gameObjectProgram).apply {
+    val rocketMaterial = Material(gameObjectProgram).apply {
         this["colorTexture"]?.set(Texture2D(gl, "media/missile_cropped.png"))
         this["tint"]?.set(1f, 1f, 1f, 1f)
     }
@@ -100,8 +100,8 @@ class Scene(
     private val spawnInterval = 2.0f
     private var spawnAccum = 0.0f
 
-    private val maxChasers = 12
-    private val maxUfos    = 12
+    private val maxRockets = 10
+    private val maxUfos    = 10
 
     private fun rand(min: Float, max: Float) =
         Random.nextFloat() * (max - min) + min
@@ -115,15 +115,15 @@ class Scene(
         )
     }
 
-    private fun spawnChaser() {
-        val count = objects.count { it is Chaser }
-        if (count >= maxChasers) return
+    private fun spawnRocket() {
+        val count = objects.count { it is Rocket }
+        if (count >= maxRockets) return
 
         val p = randomPointInBackground()
-        val ch = Chaser(
+        val ch = Rocket(
             avatar,
-            0.1f, 0.5f, Vec2(1f, 100f),
-            Mesh(chaserMaterial, quadGeometry)
+            0.1f, 0.5f, Vec2(1f, 15f),
+            Mesh(rocketMaterial, quadGeometry)
         ).apply {
             scale.set(0.1f, 0.07f, 0.1f)
             position.set(p)
@@ -152,12 +152,12 @@ class Scene(
 
     private fun spawnEnemy() {
         val coin = Random.nextBoolean()
-        val canChaser = objects.count { it is Chaser } < maxChasers
+        val canRocket = objects.count { it is Rocket } < maxRockets
         val canUfo    = objects.count { it is UFO }    < maxUfos
         when {
-            coin && canChaser -> spawnChaser()
+            coin && canRocket -> spawnRocket()
             !coin && canUfo   -> spawnUfo()
-            canChaser         -> spawnChaser()
+            canRocket         -> spawnRocket()
             canUfo            -> spawnUfo()
             else              -> {}
         }
@@ -198,7 +198,7 @@ class Scene(
                 if (overlap) {
                     val aIsAvatar = a is Avatar
                     val bIsAvatar = b is Avatar
-                    val otherIsThreat = (a is UFO || a is Chaser || b is UFO || b is Chaser)
+                    val otherIsThreat = (a is UFO || a is Rocket || b is UFO || b is Rocket)
 
                     if ((aIsAvatar || bIsAvatar) && otherIsThreat) {
                         avatarHit = true
