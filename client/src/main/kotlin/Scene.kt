@@ -55,7 +55,7 @@ class Scene(
     }
 
     fun spawnBullet(avatar: Avatar) {
-        val relativeVelocity = 2.0f
+        val relativeVelocity = 3.0f
         val bullet = Bullet(
             0.1f,
             5.0f,
@@ -73,7 +73,7 @@ class Scene(
     val avatar = Avatar(
         0.1f,
         0.25f,
-        Vec2(1.0f, 100.0f),
+        Vec2(1.0f, 10.0f),
         Mesh(raiderMaterial, quadGeometry)).apply {
         scale.set(0.15f, 0.15f, 0.15f)
         yaw = PI.toFloat()/2.0f
@@ -107,8 +107,8 @@ class Scene(
         Random.nextFloat() * (max - min) + min
 
     private fun randomPointInBackground(): Vec2 {
-        val hw = background.scale.x * 0.5f
-        val hh = background.scale.y * 0.5f
+        val hw = background.scale.x
+        val hh = background.scale.y
         return Vec2(
             rand(background.position.x - hw, background.position.x + hw),
             rand(background.position.y - hh, background.position.y + hh)
@@ -159,7 +159,7 @@ class Scene(
             !coin && canUfo   -> spawnUfo()
             canChaser         -> spawnChaser()
             canUfo            -> spawnUfo()
-            else              -> { /* both capped; do nothing */ }
+            else              -> {}
         }
     }
 
@@ -196,7 +196,6 @@ class Scene(
 
                 val overlap = overlap(a, b, square = false)
                 if (overlap) {
-                    // Paint avatar red if collision avatar<->(UFO|Chaser)
                     val aIsAvatar = a is Avatar
                     val bIsAvatar = b is Avatar
                     val otherIsThreat = (a is UFO || a is Chaser || b is UFO || b is Chaser)
@@ -251,33 +250,25 @@ class Scene(
         background.draw(camera)
 
         if (!isPaused) {
-
             spawnAccum += dt
             while (spawnAccum >= spawnInterval) {
                 spawnEnemy()
                 spawnAccum -= spawnInterval
             }
-
             objects.forEach {
                 it.update(dt, keysPressed, ArrayList<GameObject>(), drag)
+                if (abs(it.position.x) > background.scale.x || abs(it.position.y) >background.scale.y) {
+                    if (it == avatar) {
+                        backgroundMaterial["tint"]?.set(1f, 0f, 0f, 1f)
+                        isPaused = true
+                    }
+                    objects.remove(it)
+                }
             }
-
             handleCollisions()
             sweepDead()
         }
-
-        val hw = background.scale.x
-        val hh = background.scale.y
-        val dx = avatar.position.x - background.position.x
-        val dy = avatar.position.y - background.position.y
-        if (kotlin.math.abs(dx) > hw || kotlin.math.abs(dy) > hh) {
-            objects.remove(avatar)
-            backgroundMaterial["tint"]?.set(1f, 0f, 0f, 1f)
-            isPaused = true
-        }
-
         objects.forEach { it.draw(camera) }
-
         gl.useProgram(animationProgram.glProgram)
         fx.removeAll { !it.advance(dt) }
         fx.forEach { it.draw(camera) }

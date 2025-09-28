@@ -15,8 +15,8 @@ class Avatar(mass: Float, momentOfInertia: Float, dragCoeffs: Vec2, vararg meshe
     init {
         calcForce = {
                 keysPressed: Set<String> ->
-            val F = 1.2f
-            if (keysPressed.contains("W")) Vec2(F, 0.0f).rotateAssign(yaw) else Vec2()
+            val thrust = 1.2f
+            if (keysPressed.contains("W")) Vec2(thrust, 0.0f).rotateAssign(yaw) else Vec2()
         }
         calcTorque = {
                 keysPressed: Set<String> ->

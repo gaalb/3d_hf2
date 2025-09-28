@@ -7,7 +7,7 @@ fun Vec2.signedAngleTo(other: Vec2): Float {
     val bLen = other.length()
     if (aLen < EPS || bLen < EPS) return 0f
     val dot = (this dot other)
-    val crossZ = this.x * other.y - this.y * other.x // 2D "cross"
+    val crossZ = this.x * other.y - this.y * other.x
     return atan2(crossZ.toDouble(), dot.toDouble()).toFloat()
 }
 
